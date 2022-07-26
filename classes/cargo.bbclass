@@ -43,7 +43,10 @@ oe_cargo_build () {
 	bbnote "cargo = $(which ${CARGO})"
 	bbnote "rustc = $(which ${RUSTC})"
 	bbnote "${CARGO} build ${CARGO_BUILD_FLAGS} $@"
-	"${CARGO}" build ${CARGO_BUILD_FLAGS} "$@"
+	# This is needed to pick up .cargo/config.toml in the project git root
+	# see https://github.com/rust-lang/cargo/issues/10098
+	CARGO_WORKINGDIR="$(dirname "${MANIFEST_PATH}")"
+	(cd "${CARGO_WORKINGDIR}"; "${CARGO}" build ${CARGO_BUILD_FLAGS} "$@")
 }
 
 do_compile[progress] = "outof:\s+(\d+)/(\d+)"
